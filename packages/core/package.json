@@ -1,0 +1,23 @@
+{
+  "name": "@ciphera/core",
+  "version": "0.1.0",
+  "description": "Core types, errors, and constants for the Ciphera ZKP SDK",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT"
+}

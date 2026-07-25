@@ -1,7 +1,7 @@
 import type {
   DIDDocument,
   DIDResolutionResult,
-} from '@ciphera/core';
+} from '@breakchain/core';
 
 const DID_WEB_PREFIX = 'did:web:';
 

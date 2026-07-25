@@ -9,7 +9,7 @@ import {
   detectMethod,
   extractPublicKeyFromDoc,
 } from '../index';
-import { generateEd25519KeyPair, publicKeyToMultibase } from '@ciphera/crypto';
+import { generateEd25519KeyPair, publicKeyToMultibase } from '@breakchain/crypto';
 
 describe('did:key', () => {
   it('generates a valid did:key from a public key', () => {

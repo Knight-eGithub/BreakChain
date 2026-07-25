@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateEd25519KeyPair, publicKeyToMultibase } from '@ciphera/crypto';
-import { generateDidKey, createResolver } from '@ciphera/did';
+import { generateEd25519KeyPair, publicKeyToMultibase } from '@breakchain/crypto';
+import { generateDidKey, createResolver } from '@breakchain/did';
 import { createCredential, signCredential, verifyCredentialSignature, verifyCredential } from '../vc-builder';
 import { createPresentation, signPresentation, verifyPresentationSignature, verifyPresentation } from '../vp-builder';
 import { createDisclosure, hashDisclosure, issueSDJWT, presentSDJWT, verifySDJWT } from '../sd-jwt';

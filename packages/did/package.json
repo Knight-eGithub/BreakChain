@@ -1,7 +1,7 @@
 {
-  "name": "@ciphera/did",
+  "name": "@breakchain/did",
   "version": "0.1.0",
-  "description": "DID resolution for the Ciphera ZKP SDK — did:key and did:web methods",
+  "description": "DID resolution for the Breakchain ZKP SDK — did:key and did:web methods",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -18,8 +18,8 @@
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@ciphera/core": "0.1.0",
-    "@ciphera/crypto": "0.1.0"
+    "@breakchain/core": "0.1.0",
+    "@breakchain/crypto": "0.1.0"
   },
   "files": [
     "dist"

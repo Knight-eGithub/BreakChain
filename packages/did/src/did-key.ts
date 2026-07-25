@@ -2,12 +2,12 @@ import type {
   DIDDocument,
   DIDResolutionResult,
   VerificationMethod,
-} from '@ciphera/core';
+} from '@breakchain/core';
 import {
   publicKeyToMultibase,
   multibaseToPublicKey,
   publicKeyToJwk,
-} from '@ciphera/crypto';
+} from '@breakchain/crypto';
 
 /** Ed25519 multicodec prefix used to identify did:key Ed25519 keys */
 const DID_KEY_PREFIX = 'did:key:';

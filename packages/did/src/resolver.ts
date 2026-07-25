@@ -2,8 +2,8 @@ import type {
   DIDDocument,
   DIDResolutionResult,
   DIDMethod,
-} from '@ciphera/core';
-import { multibaseToPublicKey, base64urlDecode } from '@ciphera/crypto';
+} from '@breakchain/core';
+import { multibaseToPublicKey, base64urlDecode } from '@breakchain/crypto';
 import { resolveDidKey, resolveDidKeyFull, generateDidKey, didKeyToPublicKey } from './did-key';
 import { resolveDidWeb, resolveDidWebFull, didWebToUrl } from './did-web';
 

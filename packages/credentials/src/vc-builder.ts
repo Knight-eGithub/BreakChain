@@ -1,7 +1,7 @@
-import type { VerifiableCredential, CredentialSubject, CredentialProof, CredentialStatus, VerificationResult } from '@ciphera/core';
-import { createJWS, verifyJWS } from '@ciphera/crypto';
-import { W3C_CREDENTIALS_CONTEXT } from '@ciphera/core';
-import type { DIDResolver } from '@ciphera/did';
+import type { VerifiableCredential, CredentialSubject, CredentialProof, CredentialStatus, VerificationResult } from '@breakchain/core';
+import { createJWS, verifyJWS } from '@breakchain/crypto';
+import { W3C_CREDENTIALS_CONTEXT } from '@breakchain/core';
+import type { DIDResolver } from '@breakchain/did';
 
 export interface CreateCredentialOptions {
   issuer: string;

@@ -1,4 +1,4 @@
-import { createJWS, verifyJWS, decodeJWS, sha256Hash, base64urlEncode, base64urlDecode, utf8ToBytes, generateSalt } from '@ciphera/crypto';
+import { createJWS, verifyJWS, decodeJWS, sha256Hash, base64urlEncode, base64urlDecode, utf8ToBytes, generateSalt } from '@breakchain/crypto';
 
 export interface SDJWTPayload {
   iss: string;

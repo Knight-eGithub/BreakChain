@@ -1,7 +1,7 @@
 {
-  "name": "@ciphera/crypto",
+  "name": "@breakchain/crypto",
   "version": "0.1.0",
-  "description": "Cryptographic primitives for the Ciphera ZKP SDK — keys, signing, hashing, JWS",
+  "description": "Cryptographic primitives for the Breakchain ZKP SDK — keys, signing, hashing, JWS",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -18,7 +18,7 @@
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@ciphera/core": "0.1.0",
+    "@breakchain/core": "0.1.0",
     "@noble/curves": "^1.0.0",
     "@noble/hashes": "^1.0.0",
     "@scure/base": "^1.0.0"

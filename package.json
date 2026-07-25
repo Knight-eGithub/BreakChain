@@ -1,5 +1,5 @@
 {
-  "name": "ciphera-zkp",
+  "name": "breakchain-zkp",
   "version": "0.1.0",
   "private": true,
   "description": "A standards-based ZKP credential SDK with reference issuer and wallet simulators",

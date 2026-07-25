@@ -1,7 +1,7 @@
 {
-  "name": "@ciphera/core",
+  "name": "@breakchain/core",
   "version": "0.1.0",
-  "description": "Core types, errors, and constants for the Ciphera ZKP SDK",
+  "description": "Core types, errors, and constants for the Breakchain ZKP SDK",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

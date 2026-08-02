@@ -1,0 +1,35 @@
+{
+  "name": "@breakchain/wallet",
+  "version": "0.1.0",
+  "description": "Reference wallet simulator for the Breakchain ZKP credential ecosystem",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@breakchain/core": "*",
+    "@breakchain/crypto": "*",
+    "@breakchain/did": "*",
+    "@breakchain/credentials": "*",
+    "@breakchain/prover": "*",
+    "express": "^4.21.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0"
+  }
+}

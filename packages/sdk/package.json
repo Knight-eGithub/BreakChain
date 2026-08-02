@@ -1,0 +1,33 @@
+{
+  "name": "@breakchain/sdk",
+  "version": "0.1.0",
+  "description": "Developer-facing SDK for the Breakchain ZKP credential ecosystem — connectWallet, requestProof, verifyPresentation",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@breakchain/core": "*",
+    "@breakchain/crypto": "*",
+    "@breakchain/did": "*",
+    "@breakchain/credentials": "*",
+    "@breakchain/prover": "*"
+  },
+  "devDependencies": {
+    "@breakchain/wallet": "*",
+    "@breakchain/issuer": "*",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0"
+  }
+}

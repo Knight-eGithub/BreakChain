@@ -1,0 +1,41 @@
+{
+  "name": "@breakchain/wallet",
+  "version": "0.1.0",
+  "description": "Reference holder wallet with credential storage and presentation engine",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+      
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "tsx src/server.ts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@breakchain/core": "0.1.0",
+    "@breakchain/crypto": "0.1.0",
+    "@breakchain/did": "0.1.0",
+    "@breakchain/credentials": "0.1.0",
+    "express": "^4.21.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.0",
+    "vitest": "^3.2.7",
+    "tsx": "^4.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@breakchain/circuits",
+  "version": "0.1.0",
+  "description": "Circom ZK circuit definitions for the Breakchain ZKP SDK",
+  "scripts": {
+    "build": "echo 'Requires circom installed. See README.md'",
+    "clean": "node -e \"require('fs').rmSync('build',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5"
+  },
+  "files": [
+    "src",
+    "build"
+  ],
+  "license": "MIT"
+}

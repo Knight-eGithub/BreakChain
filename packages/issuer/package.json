@@ -1,0 +1,28 @@
+{
+  "name": "@breakchain/issuer",
+  "version": "0.1.0",
+  "description": "Reference OpenID4VCI credential issuer server",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "start": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@breakchain/core": "0.1.0",
+    "@breakchain/crypto": "0.1.0",
+    "@breakchain/did": "0.1.0",
+    "@breakchain/credentials": "0.1.0",
+    "express": "^4.21.0",
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/cors": "^2.8.0",
+    "vitest": "^3.2.7",
+    "tsx": "^4.0.0"
+  }
+}

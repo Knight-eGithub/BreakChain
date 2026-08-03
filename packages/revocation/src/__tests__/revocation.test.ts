@@ -1,0 +1,96 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { createServer } from 'node:http';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { createJWS, generateEd25519KeyPair } from '@breakchain/crypto';
+import { generateDidKey } from '@breakchain/did';
+import { createIssuerServer } from '../../../issuer/src';
+import { RevocationClient } from '../index';
+
+describe('revocation flow', () => {
+  let server: ReturnType<typeof createServer>;
+  let baseUrl: string;
+  let credentialId: string;
+
+  beforeAll(async () => {
+    const dbPath = path.join(tmpdir(), `breakchain-revocation-${Date.now()}.db`);
+    const app = createIssuerServer({
+      port: 0,
+      databasePath: dbPath,
+      issuerDid: 'did:key:revocationissuer',
+      adminToken: 'admin-token',
+    });
+
+    server = createServer(app);
+    await new Promise<void>((resolve) => {
+      server.listen(0, '127.0.0.1', () => resolve());
+    });
+
+    const address = server.address();
+    if (!address || typeof address === 'string') {
+      throw new Error('Server did not bind to a TCP port');
+    }
+
+    baseUrl = `http://127.0.0.1:${address.port}`;
+
+    const offerRes = await fetch(`${baseUrl}/api/credential-offer`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ credentialType: 'IDCard', format: 'ldp_vc' }),
+    });
+    const offer = await offerRes.json();
+
+    const tokenRes = await fetch(`${baseUrl}/api/token`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ pre_authorized_code: offer.pre_authorized_code }),
+    });
+    const token = await tokenRes.json();
+
+    const holderKeys = generateEd25519KeyPair();
+    const holderDid = generateDidKey(holderKeys.publicKey);
+    const proofJwt = createJWS({ nonce: token.c_nonce, holderDid }, holderKeys.privateKey);
+
+    const credentialRes = await fetch(`${baseUrl}/api/credential`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${token.access_token}`,
+      },
+      body: JSON.stringify({ format: 'ldp_vc', proof: { jwt: proofJwt }, holderDid }),
+    });
+    const credentialPayload = await credentialRes.json();
+    credentialId = credentialPayload.credential.id;
+  });
+
+  afterAll(async () => {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  });
+
+  it('checks status, revokes credentials, and serves a status list', async () => {
+    const client = new RevocationClient(baseUrl);
+
+    const initial = await client.checkStatus(credentialId);
+    expect(initial.revoked).toBe(false);
+
+    const revokeRes = await fetch(`${baseUrl}/api/revoke`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer admin-token',
+      },
+      body: JSON.stringify({ credentialId }),
+    });
+    expect(revokeRes.ok).toBe(true);
+
+    const revoked = await client.checkStatus(credentialId);
+    expect(revoked.revoked).toBe(true);
+
+    const statusListRes = await fetch(`${baseUrl}/api/status-list`);
+    expect(statusListRes.ok).toBe(true);
+    const statusList = await statusListRes.json();
+    expect(statusList.credential).toBeDefined();
+  });
+});

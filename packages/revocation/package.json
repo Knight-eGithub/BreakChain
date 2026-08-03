@@ -1,0 +1,17 @@
+{
+  "name": "@breakchain/revocation",
+  "version": "0.1.0",
+  "description": "Credential revocation and StatusList2021 support",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@breakchain/core": "0.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
+  }
+}

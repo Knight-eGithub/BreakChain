@@ -1,0 +1,31 @@
+{
+  "name": "@breakchain/demo-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Demo web application showcasing the Breakchain ZKP SDK ecosystem",
+  "type": "module",
+  "scripts": {
+    "deps:build": "npm run build --workspace=@breakchain/core && npm run build --workspace=@breakchain/crypto && npm run build --workspace=@breakchain/did && npm run build --workspace=@breakchain/credentials",
+    "predev": "npm run deps:build",
+    "dev": "vite",
+    "prebuild": "npm run deps:build",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@breakchain/core": "0.1.0",
+    "@breakchain/crypto": "0.1.0",
+    "@breakchain/did": "0.1.0",
+    "@breakchain/credentials": "0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.5.0",
+    "vite": "^6.0.0"
+  }
+}

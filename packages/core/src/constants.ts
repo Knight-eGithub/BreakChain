@@ -20,7 +20,6 @@ export const W3C_DID_CONTEXT = 'https://www.w3.org/ns/did/v1';
 export const STATUS_LIST_2021_CONTEXT = 'https://w3id.org/vc-revocation-list-2021/v1';
 
 export const DEFAULT_SDK_CONFIG: Partial<SDKConfig> = {
-  walletAdapterType: 'http',
   verificationMode: 'local',
   revocationCheck: true,
   defaultProofMode: 'zkp',

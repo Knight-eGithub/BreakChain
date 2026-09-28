@@ -47,6 +47,9 @@ import {
   WalletConnectionError,
 } from '@breakchain/core';
 import { HttpWalletAdapter } from './http-wallet-adapter';
+import { PostMessageWalletAdapter } from './postmessage-wallet-adapter';
+import { DeepLinkWalletAdapter } from './deeplink-wallet-adapter';
+import type { DeepLinkAdapterOptions } from './deeplink-wallet-adapter';
 import { PresentationRequestBuilder } from './request-builder';
 import { VerificationEngine } from './verification-engine';
 import type { VerificationEngineOptions } from './verification-engine';
@@ -86,6 +89,8 @@ export class BreakchainSDK {
       proverBackend?: ProverBackend;
       /** Custom fetch function (for testing). */
       fetchFn?: typeof fetch;
+      /** Options for deep link adapter (required when walletAdapterType is 'deepLink') */
+      deepLinkOptions?: DeepLinkAdapterOptions;
     }
   ) {
     this.config = { ...DEFAULT_SDK_CONFIG, ...config } as SDKConfig;
@@ -94,7 +99,24 @@ export class BreakchainSDK {
     if (options?.adapter) {
       this.adapter = options.adapter;
     } else {
-      this.adapter = new HttpWalletAdapter(options?.fetchFn);
+      switch (this.config.walletAdapterType) {
+        case 'postMessage':
+        case 'extension':
+          this.adapter = new PostMessageWalletAdapter();
+          break;
+        case 'deepLink':
+          if (!options?.deepLinkOptions) {
+            throw new WalletConnectionError(
+              'deepLinkOptions are required when walletAdapterType is "deepLink"'
+            );
+          }
+          this.adapter = new DeepLinkWalletAdapter(options.deepLinkOptions);
+          break;
+        case 'http':
+        default:
+          this.adapter = new HttpWalletAdapter(options?.fetchFn);
+          break;
+      }
     }
 
     // Initialize the verification engine

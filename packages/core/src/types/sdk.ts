@@ -6,6 +6,8 @@ import { PresentationDefinition, CredentialOffer } from './protocols';
 
 export interface SDKConfig {
   walletAdapterType?: 'http' | 'postMessage' | 'extension' | 'deepLink';
+  /** Application client ID for production deployments */
+  clientId?: string;
   walletUrl?: string;
   walletOrigin?: string;
   issuerUrl?: string;

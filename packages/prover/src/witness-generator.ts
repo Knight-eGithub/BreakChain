@@ -17,13 +17,14 @@ export class WitnessGenerator {
    * @param salt Random salt for the commitment
    * @param ageHash Poseidon(age, salt) — must be pre-computed
    */
-  generateAgeOverInputs(age: number, salt: bigint, ageHash: bigint): WitnessInput {
+  generateAgeOverInputs(age: number, salt: bigint, ageHash: bigint, ageThreshold: number = 18): WitnessInput {
     return {
       circuitId: 'age_over',
       inputs: {
         age: BigInt(age),
         salt,
-        ageHash
+        ageHash,
+        ageThreshold: BigInt(ageThreshold)
       }
     };
   }

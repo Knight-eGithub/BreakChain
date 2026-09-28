@@ -58,6 +58,7 @@ describe('Real ZKP Proofs (Groth16 + snarkjs)', () => {
         age: age,
         salt: salt.toString(),
         ageHash: ageHash.toString(),
+        ageThreshold: 18,
       };
 
       // Generate proof
@@ -84,7 +85,7 @@ describe('Real ZKP Proofs (Groth16 + snarkjs)', () => {
       const ageHash = F.toObject(hash);
 
       const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-        { age, salt: salt.toString(), ageHash: ageHash.toString() },
+        { age, salt: salt.toString(), ageHash: ageHash.toString(), ageThreshold: 18 },
         wasmPath('age_over'),
         zkeyPath('age_over')
       );
@@ -104,7 +105,7 @@ describe('Real ZKP Proofs (Groth16 + snarkjs)', () => {
       // `gte.out === 1` will not be satisfied
       await expect(
         snarkjs.groth16.fullProve(
-          { age, salt: salt.toString(), ageHash: ageHash.toString() },
+          { age, salt: salt.toString(), ageHash: ageHash.toString(), ageThreshold: 18 },
           wasmPath('age_over'),
           zkeyPath('age_over')
         )
@@ -118,10 +119,53 @@ describe('Real ZKP Proofs (Groth16 + snarkjs)', () => {
 
       await expect(
         snarkjs.groth16.fullProve(
-          { age, salt: salt.toString(), ageHash: wrongHash },
+          { age, salt: salt.toString(), ageHash: wrongHash, ageThreshold: 18 },
           wasmPath('age_over'),
           zkeyPath('age_over')
         )
+      ).rejects.toThrow();
+    });
+
+    it('proves age >= 21 with custom threshold — should PASS', async () => {
+      const age = 25;
+      const salt = 12345n;
+      const hash = poseidon([age, salt]);
+      const ageHash = F.toObject(hash);
+
+      const input = {
+        age: age,
+        salt: salt.toString(),
+        ageHash: ageHash.toString(),
+        ageThreshold: 21,
+      };
+
+      const { proof, publicSignals } = await snarkjs.groth16.fullProve(
+        input,
+        wasmPath('age_over'),
+        zkeyPath('age_over')
+      );
+
+      expect(proof).toBeDefined();
+      const vkey = loadVKey('age_over');
+      const verified = await snarkjs.groth16.verify(vkey, publicSignals, proof);
+      expect(verified).toBe(true);
+    });
+
+    it('rejects age < 21 with threshold 21 — should FAIL at witness generation', async () => {
+      const age = 20;
+      const salt = 99999n;
+      const hash = poseidon([age, salt]);
+      const ageHash = F.toObject(hash);
+
+      const input = {
+        age: age,
+        salt: salt.toString(),
+        ageHash: ageHash.toString(),
+        ageThreshold: 21,
+      };
+
+      await expect(
+        snarkjs.groth16.fullProve(input, wasmPath('age_over'), zkeyPath('age_over'))
       ).rejects.toThrow();
     });
   });
@@ -229,7 +273,7 @@ describe('Real ZKP Proofs (Groth16 + snarkjs)', () => {
       const ageHash = F.toObject(hash);
 
       const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-        { age, salt: salt.toString(), ageHash: ageHash.toString() },
+        { age, salt: salt.toString(), ageHash: ageHash.toString(), ageThreshold: 18 },
         wasmPath('age_over'),
         zkeyPath('age_over')
       );

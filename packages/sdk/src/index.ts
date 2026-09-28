@@ -19,6 +19,11 @@ export type { RequestBuilderOptions } from './request-builder';
 export { VerificationEngine } from './verification-engine';
 export type { VerificationEngineOptions } from './verification-engine';
 
+export { PostMessageWalletAdapter } from './postmessage-wallet-adapter';
+
+export { DeepLinkWalletAdapter } from './deeplink-wallet-adapter';
+export type { DeepLinkCallbacks, DeepLinkAdapterOptions } from './deeplink-wallet-adapter';
+
 // Re-export key types from core for consumer convenience
 export type {
   SDKConfig,

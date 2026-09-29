@@ -1,76 +1,108 @@
 # SDK Architecture (Fully Built State)
 
-This diagram represents the **complete, final architecture** of the Breakchain ZKP Ecosystem once all phases (up to Phase 10) are successfully implemented. It includes the developer SDK, the backend simulated servers (Issuer & Wallet), and the ZKP proving mechanisms.
+This document details the **production architecture** of the Breakchain ZKP Ecosystem. It encompasses the client-side developer SDK, the server-side verification engine, the multi-transport wallet adapters, the reference backend simulators (Issuer & Wallet), and the parameterized Groth16 ZKP proving mechanics.
 
 ```mermaid
 graph TD
     %% Define Styles
-    classDef frontend fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
-    classDef sdkPackage fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef backend fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
-    classDef zkp fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef db fill:#eceff1,stroke:#607d8b,stroke-width:2px;
+    classDef frontend fill:#18181b,stroke:#3f3f46,stroke-width:2px,color:#fafafa;
+    classDef sdkPackage fill:#0f0f12,stroke:#10b981,stroke-width:2px,color:#fafafa;
+    classDef backend fill:#18181b,stroke:#8b5cf6,stroke-width:2px,color:#fafafa;
+    classDef zkp fill:#18181b,stroke:#06b6d4,stroke-width:2px,color:#fafafa;
+    classDef db fill:#09090b,stroke:#64748b,stroke-width:2px,color:#fafafa;
 
     %% Verifier Application
-    subgraph Verifier App ["Demo Web App (Verifier)"]
-        UI[Web UI<br/>(React/Next.js)]:::frontend
-        SDKApi["BreakchainSDK<br/>(connectWallet, requestProof, verify)"]:::sdkPackage
+    subgraph Verifier App ["Consumer Verifier Application (e.g. Next.js Showcase)"]
+        UI["<b>Web / Mobile UI</b><br/>(React / Next.js 16 App Router)"]:::frontend
+        ClientSDK["<b>BreakchainSDK (Client)</b><br/>- connectWallet()<br/>- requestProof()"]:::sdkPackage
+        ServerAPI["<b>Backend API Route (/api/verify)</b><br/>- verifyPresentation()<br/>- Session Grant"]:::frontend
+        ServerVerifier["<b>@breakchain/sdk/server</b><br/>- 5-Layer Crypto Engine<br/>- Independent Verifier"]:::sdkPackage
+    end
+
+    %% Transport Adapters
+    subgraph Transport Layer ["Wallet Transport Adapters (@breakchain/sdk)"]
+        PMAdapter["<b>PostMessageWalletAdapter</b><br/>(Extensions & Embedded Iframes)"]:::sdkPackage
+        DLAdapter["<b>DeepLinkWalletAdapter</b><br/>(Mobile Apps openid4vp:// & QR)"]:::sdkPackage
+        HTTPAdapter["<b>HttpWalletAdapter</b><br/>(HTTP REST / SSE)"]:::sdkPackage
     end
 
     %% Breakchain Core SDK Layers
-    subgraph SDK Ecosystem ["Breakchain Packages (npm workspaces)"]
-        Revocation["@breakchain/revocation<br/>(Status List Checking)"]:::sdkPackage
-        Core["@breakchain/core<br/>(Shared Types)"]:::sdkPackage
-        Crypto["@breakchain/crypto<br/>(KeyStore, Crypto Ops)"]:::sdkPackage
-        DID["@breakchain/did<br/>(did:key, did:web)"]:::sdkPackage
-        Credentials["@breakchain/credentials<br/>(VC/VP, SD-JWT)"]:::sdkPackage
+    subgraph SDK Ecosystem ["Core Breakchain Packages (npm workspaces)"]
+        Core["<b>@breakchain/core</b><br/>(Shared Types, Errors, Interfaces)"]:::sdkPackage
+        Crypto["<b>@breakchain/crypto</b><br/>(Ed25519, JWS, KeyStore)"]:::sdkPackage
+        DID["<b>@breakchain/did</b><br/>(did:key, did:web resolvers)"]:::sdkPackage
+        Credentials["<b>@breakchain/credentials</b><br/>(VC/VP v2, SD-JWT Engine)"]:::sdkPackage
     end
 
     %% Prover and Circuits
-    subgraph ZKP Engine ["Zero-Knowledge Prover"]
-        Prover["@breakchain/prover<br/>(snarkjs wrapper, Witness Gen)"]:::zkp
-        Circuits["@breakchain/circuits<br/>(Circom WASM assets)"]:::zkp
+    subgraph ZKP Engine ["Zero-Knowledge Prover Engine"]
+        Prover["<b>@breakchain/prover</b><br/>(snarkjs wrapper, Witness Gen)"]:::zkp
+        Circuits["<b>@breakchain/circuits</b><br/>(Parameterized Circom WASM & zkey)"]:::zkp
     end
 
     %% Server Simulators
-    subgraph Server Simulators ["Reference Simulators"]
-        Wallet["@breakchain/wallet<br/>(Simulated Wallet Server :3002)"]:::backend
-        Issuer["@breakchain/issuer<br/>(Simulated Issuer Server :3001)"]:::backend
-        DB[(SQLite<br/>Credentials / Logs)]:::db
+    subgraph Ecosystem Nodes ["Ecosystem Nodes & Registries"]
+        Wallet["<b>@breakchain/wallet</b><br/>(Identity, Keystore, Proof Engine)"]:::backend
+        Issuer["<b>@breakchain/issuer</b><br/>(OpenID4VCI Server, Ed25519 Signer)"]:::backend
+        StatusList["<b>StatusList2021 Registry</b><br/>(Live Revocation Bitstring)"]:::backend
+        DB[("SQLite Database<br/>(Credentials & Audit Logs)")]:::db
     end
 
-    %% Data Flow & Protocols
-    UI -->|Uses| SDKApi
-    SDKApi -->|OIDC4VP (request presentation)| Wallet
-    SDKApi -->|verify signature| DID
-    SDKApi -->|verify ZK proof| Prover
-    SDKApi -->|check status| Revocation
-    
-    Wallet -->|OIDC4VCI (get credential)| Issuer
-    Wallet -->|generates proof| Prover
+    %% Communication Flow
+    UI -->|Calls| ClientSDK
+    ClientSDK -->|Selects Transport| PMAdapter
+    ClientSDK -->|Selects Transport| DLAdapter
+    ClientSDK -->|Selects Transport| HTTPAdapter
+
+    PMAdapter -->|window.postMessage RPC| Wallet
+    DLAdapter -->|openid4vp:// deep link| Wallet
+    HTTPAdapter -->|HTTP POST| Wallet
+
+    Wallet -->|Generates Groth16 Proof| Prover
+    Prover -->|Loads WASM & zkey| Circuits
     Wallet -->|Secure Key Mgmt| Crypto
-    Wallet -->|Credential Ops| Credentials
+    Wallet -->|Builds VP| Credentials
 
-    Issuer -->|reads/writes| DB
-    Issuer -->|Credential Ops| Credentials
-    Issuer -->|Signing| Crypto
-    
-    Revocation -->|queries status| Issuer
+    UI -.->|Submits VP Presentation| ServerAPI
+    ServerAPI -->|Independent Verification| ServerVerifier
+    ServerVerifier -->|1. Resolves DIDs| DID
+    ServerVerifier -->|2. Verifies ZK Proof| Prover
+    ServerVerifier -->|3. Validates Signatures| Crypto
+    ServerVerifier -->|4. Checks Revocation| StatusList
 
-    Prover -->|loads .wasm & .zkey| Circuits
-
-    %% Shared dependencies mapping
-    DID -.-> Core
-    Crypto -.-> Core
-    Credentials -.-> Core
-    Prover -.-> Core
-    Revocation -.-> Core
+    Wallet -->|OID4VCI Get Credential| Issuer
+    Issuer -->|Signs VC/SD-JWT| Crypto
+    Issuer -->|Issues Credentials| Credentials
+    Issuer -->|Persists Data| DB
+    Issuer -->|Updates Bitstring| StatusList
 ```
 
-### Components of the Final Architecture
-1. **Verifier Web App**: The demo frontend built with React/Next.js. It integrates the developer-facing `@breakchain/sdk`.
-2. **Breakchain SDK Ecosystem**: The set of fully implemented NPM packages handling DID resolution, VC operations, KeyStore logic, and revocation checks.
-3. **ZKP Engine**: Consists of compiled Circom circuits (`@breakchain/circuits`) and the `snarkjs` wrapper (`@breakchain/prover`), which allows local WASM proof generation and verification.
-4. **Reference Simulators**:
-   *   **Wallet Simulator**: Handles the holder's credential storage, identity, user consent, and proof generation. Interacts via OIDC protocols.
-   *   **Issuer Simulator**: Simulates a government/organization issuer. Issues credentials using OpenID4VCI, backed by a SQLite database for managing issued credentials and tracking revocation status.
+---
+
+## Architectural Highlights
+
+### 1. Dual-Sided Verification Architecture
+* **Client-Side (`@breakchain/sdk`)**: Integrates into the frontend to handle wallet connection, user consent, and proof requests across 3 transport mechanisms (`PostMessage`, `DeepLink`, and `HTTP`).
+* **Server-Side (`@breakchain/sdk/server`)**: Enforces cryptographic integrity on backend API routes (e.g. Next.js Route Handlers) to verify presentations independently without trusting the client browser.
+
+### 2. The 5-Layer Cryptographic Pipeline
+The server verification engine evaluates every presentation across 5 distinct security layers:
+1. **Schema Check**: Validates that the presented credential contains the requested attribute.
+2. **Issuer Authority Signature**: Verifies the `Ed25519Signature2020` / JWS digital signature of the issuer's DID.
+3. **Condition Proof**: Evaluates the Groth16 mathematical zero-knowledge proof or SD-JWT disclosure against the threshold.
+4. **Holder Key Binding**: Verifies that the presenter signed a server nonce challenge using the private key matching the credential's `holderDid` (prevents stolen token attacks).
+5. **Real-Time Revocation**: Queries the issuer's live StatusList2021 registry for active status.
+
+### 3. Parameterized Groth16 Circuits
+Circuits in `@breakchain/circuits` accept dynamic parameters (e.g., `ageThreshold` in `age_over.circom`). This eliminates the need for hardcoded limits and allows a single compiled circuit artifact to verify arbitrary thresholds (`18+`, `21+`, `65+`, etc.).
+
+### 4. Reference Full-Stack Showcase
+Demonstrated in `breakchain-showcase` (Next.js 16 App Router / React 19):
+* Real-world implementations of 3 consumer applications:
+  * **Viper Esports 21+ VIP Tournament** (`age >= 21` via Groth16 ZKP)
+  * **National Citizen Service Portal** (`nationality == 356 IND` via ZKP)
+  * **TechCareers Engineering Gateway** (`degree == 'B.Tech'` via SD-JWT)
+* Dynamic 3-tier credential categorization:
+  * ✅ *Has Criteria & Meets Condition*
+  * ❌ *Has Criteria & Fails Condition*
+  * ⚠️ *Missing Criteria (Incompatible Schema)*
